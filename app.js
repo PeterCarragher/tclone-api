@@ -29,6 +29,9 @@ mongoose
     })
 
 var app = express()
+// app.get('/', (req, res) => res.send('Hello World!'))
+
+// app.listen(6969, () => console.log(`Example app listening at http://localhost:${port}`))
 const passport = require('./passport')
 //app.set('trust proxy', 1) // trust first proxy, when node is behind proxy server
 

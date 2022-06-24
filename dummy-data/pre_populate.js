@@ -18,27 +18,27 @@ const Friendship = require('../models/friendship.model')
  * Though you can enable that in your own fork, just uncomment related sections 
  * and paste timeline json in ./home_timeline.json
  */
-// const dummy_timeline = require('./home_timeline.json')
+const dummy_timeline = require('./home_timeline.json')
 
 async function pre_populate() {
     assert(mongoose.connection.readyState, 1, 'Database not connected');
     try {
         //Populate posts
 
-        // const starterPromise = Promise.resolve(null)
-        // await dummy_timeline.reduce(
-        //     (p, post) => p.then(() => populatePost(post)),
-        //     starterPromise
-        // );
+        const starterPromise = Promise.resolve(null)
+        await dummy_timeline.reduce(
+            (p, post) => p.then(() => populatePost(post)),
+            starterPromise
+        );
 
-        //make a test user =test=
-        // if (!await User.exists({ screen_name: 'test' })) {
-        //     let user = await User.createNew({
-        //         screen_name: 'test',
-        //         name: 'test',
-        //         description: "Test User whom password was taken by many :)...",
-        //     }, { password: 'test' })
-        // }
+        // make a test user =test=
+        if (!await User.exists({ screen_name: 'test' })) {
+            let user = await User.createNew({
+                screen_name: 'test',
+                name: 'test',
+                description: "Test User whom password was taken by many :)...",
+            }, { password: 'test' })
+        }
         // update trends
 
         /*
@@ -55,35 +55,35 @@ async function pre_populate() {
     }
 }
 
-// /**
-//  * 
-//  * @param {any} post raw json to save post in db and parse for user, retweeted/quoted status and calls itself  recursively for embedded tweets
-//  * @returns {Promise<Post>} post object in db
-//  */
-// async function populatePost(post) {
-//     let user = await User.findOne({ id_str: post.user.id_str });
-//     if (!user) {
-//         user = await User.create(post.user);
-//     }
-//     post.user = user._id;
-//     let { retweeted_status, quoted_status } = post
-//     if (retweeted_status) {
-//         let rs = await Post.findOne({ id_str: retweeted_status.id_str })
-//         if (!rs)
-//             rs = await populatePost(retweeted_status)
-//         post.retweeted_status = rs._id
-//     }
-//     if (quoted_status) {
-//         let qs = await Post.findOne({ id_str: quoted_status.id_str })
-//         if (!qs)
-//             qs = await populatePost(quoted_status)
-//         post.quoted_status = qs._id
-//     }
-//     let pst = await Post.findOne({ id_str: post.id_str })
-//     if (!pst) {
-//         pst = await Post.create(post)
-//     }
-//     return pst
-// }
+/**
+ * 
+ * @param {any} post raw json to save post in db and parse for user, retweeted/quoted status and calls itself  recursively for embedded tweets
+ * @returns {Promise<Post>} post object in db
+ */
+async function populatePost(post) {
+    let user = await User.findOne({ id_str: post.user.id_str });
+    if (!user) {
+        user = await User.create(post.user);
+    }
+    post.user = user._id;
+    let { retweeted_status, quoted_status } = post
+    if (retweeted_status) {
+        let rs = await Post.findOne({ id_str: retweeted_status.id_str })
+        if (!rs)
+            rs = await populatePost(retweeted_status)
+        post.retweeted_status = rs._id
+    }
+    if (quoted_status) {
+        let qs = await Post.findOne({ id_str: quoted_status.id_str })
+        if (!qs)
+            qs = await populatePost(quoted_status)
+        post.quoted_status = qs._id
+    }
+    let pst = await Post.findOne({ id_str: post.id_str })
+    if (!pst) {
+        pst = await Post.create(post)
+    }
+    return pst
+}
 
 module.exports = pre_populate
